@@ -1,0 +1,59 @@
+;Red
+Rebol [
+  Title: "Append+"
+  Purpose: "Implements an Append which can conditionally select the items to add to a series"
+]
+
+
+append+: func [
+	"Conditionally append a value or values in a block"
+	target [series!] "The target series"
+	data "The value"
+	/where condition [function! block!] 
+	{A block with DATA word or an arity 1 function to pass DATA to
+	 Note: TARGET/DATA/DATA-TEMP words are bound to this code, so your [CODITION BLOCK] gets all.
+	 DATA should be the only one used 
+	 If you use them in your code and you have to use these words in your test block, 
+	 use PATHS!: system/words/DATA
+	}
+	/local
+	data-temp
+	] [
+
+	either where [ 
+		case [ 
+			all [function? :condition] [
+				either series? data [
+					forall data [
+						if probe condition data-temp: first data [
+							append target probe data-temp
+						]
+					]
+				]
+				[
+					append target data
+				]
+			]			
+			
+			all [block? :condition] [
+
+						condition: bind copy/deep condition 'data
+				
+						either series? data [
+							data-temp: data
+							forall data-temp [
+								data: first data-temp
+								if do condition [append target data]
+							]
+						]
+						[
+								if do condition [append target data]
+						]
+			]
+		]
+	]
+	[
+		append target data
+	]
+	head target
+]
