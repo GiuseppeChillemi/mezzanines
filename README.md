@@ -1,2 +1,2 @@
 # mezzanines
-My mezzanine repository
+My mezzanines repository
